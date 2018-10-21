@@ -260,7 +260,11 @@ write_csv(spr_final,
 cnbv_input_ <- read_csv("../data/cnbv/processed" %>% file.path(
       "municipios_select_x11.csv")) %>% 
   gather("fecha", "cnbv_x11", starts_with("20"), convert = TRUE) %>% 
-  spread(banco, cnbv_x11, fill = 0) %>% 
+  spread(banco, cnbv_x11, fill = 0)
+write_csv(cnbv_input_,
+          "../data/cnbv/processed/auxiliar.csv")
+cnbv_input_ <- read_csv("../data/cnbv/processed" %>% file.path(
+  "auxiliar.csv")) %>% 
   transmute(CVEMUN = CVEMUN, fecha = fecha, 
       todos_x11 = valor, 
       otros_x11 = otros, 
