@@ -1,0 +1,29 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1539037787600.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "4FE9BD10",
+    "lastKnownWriteTime" : 7992934137862,
+    "last_content_update" : 1539037787600,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "32F48BDC",
+        "caption" : "metro_acumulado",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=metro_acumulado&cache_key=32F48BDC",
+        "displayedObservations" : "511",
+        "environment" : "",
+        "object" : "metro_acumulado",
+        "preview" : "0",
+        "totalObservations" : "511",
+        "variables" : "5"
+    },
+    "relative_order" : 6,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

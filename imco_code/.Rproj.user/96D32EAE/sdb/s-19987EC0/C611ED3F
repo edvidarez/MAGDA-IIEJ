@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "# Diego Villamil, OPI\n# CDMX, 15 de enero de 2017\n\n\n# Empata las series de x11 con el predictor correspondiente. \n\n# La tabla se refiere a la referencia de los grupos.\nimporta_tabla <- TRUE\n\nif (!importa_tabla) {\n  muns_selecto <- read.csv(\n    \"../data/cnbv/processed/predictor_x11_selecto_estatal_corregido.csv\",\n    colClasses = c(\"character\", \"character\", \"character\", \"numeric\"), \n    stringsAsFactors = FALSE)\n} else {\n  predictores <- read_csv(\"../data/referencias/series_x11_cnbv.csv\") %>%\n    select(CVEENT, Estado, predictor_x11) %>% \n    mutate(CVEENT = CVEENT %>% str_pad(2, \"left\", \"0\")) %$% {\n      predictor_x11 %>% set_names(CVEENT) }\n   \n  muns_selecto <- read_csv(\"../data/cnbv/processed\" %>% \n      file.path(\"municipios_x11_input.csv\" )) %>% \n    gather(clave_tmp, selecto_x11, ends_with(\"_x11\")) %>% \n    mutate(CVEENT = CVEMUN %>% str_sub(1, 2),\n      predictor_x11 = predictores[CVEENT]) %>% select(-CVEENT) %>%\n    filter(clave_tmp == predictor_x11) %>% select(-clave_tmp)\n}\n\n\nestados_selecto <- muns_selecto %>% \n  mutate(CVEENT = str_sub(CVEMUN, 1, 2)) %>% \n  group_by(trimestre, CVEENT) %>% \n  summarize(atm_selecto = sum(selecto_x11), \n      predictor_x11 = max(predictor_x11))\n\ngg_selecto <- estados_selecto %>% \n  ggplot(aes(trimestre, atm_selecto)) + \n  facet_wrap(~CVEENT, scales = \"free_y\") +\n  geom_line()\n\n\n\nwrite_csv(estados_selecto, \n  \"../data/cnbv/processed/x11_selecto_estados_martes.csv\")\n\nmetros_selecto <- read_csv(\n      \"../data/referencias/zonas_metro_estado_ok.csv\") %>% \n  mutate(CVEMET = CVEMET %>% str_pad(3, \"left\", \"0\"), \n         CVEMUN = CVEMUN %>% str_pad(5, \"left\", \"0\"), \n         CVEENT = CVEENT %>% str_pad(2, \"left\", \"0\")) %>% \n  select(CVEMET, zona_metro = nombre_corto, CVEMUN, CVEENT) %>% \n  left_join(muns_selecto, by = \"CVEMUN\") %>% \n  group_by(trimestre, CVEENT, CVEMET, zona_metro) %>% \n  summarize(atm_selecto = sum(selecto_x11), \n      predictor_x11 = max(predictor_x11))\n\nwrite_csv(metros_selecto, \n  \"../data/cnbv/processed/x11_selecto_zonas_metro_martes.csv\")\n  \n\n\n\n\n\n\n\n\n\n\n",
+    "created" : 1539037605468.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1329157705",
+    "id" : "C611ED3F",
+    "lastKnownWriteTime" : 1539032711,
+    "last_content_update" : 1539032711,
+    "path" : "~/programming/pap/otoño/indice-de-actividad-economica/imco_code/2d_guardar_selecto_x11.R",
+    "project_path" : null,
+    "properties" : {
+    },
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

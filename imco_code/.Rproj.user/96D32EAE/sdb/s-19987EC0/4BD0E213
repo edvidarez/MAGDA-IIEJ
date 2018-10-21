@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "### Verificamos cuál de las series se ajusta mejor para cada estado ###\n\nentrena_filtro <- FALSE\n\n\nx11 <- read.csv(\"../data/cnbv/processed/municipios_x11_input.csv\",\n    stringsAsFactors = F, \n    colClasses = c(\"character\", \"character\", \"numeric\", \"numeric\",\n    \"numeric\", \"numeric\", \"numeric\", \"numeric\", \"numeric\")) %>%\n  mutate(otros_x11 = suma_x11 - bancomer_x11 - banamex_x11,\n    banban_x11 = bancomer_x11 + banamex_x11,\n    otrosbbv_x11 = otros_x11 + bancomer_x11)\n\n\nif (!entrena_filtro) { \n  sel_x11 <- read_csv(\"../data/referencias/correlaciones_x11_cnbv.csv\")\n\n} else {\n  itaee <- read.csv(\"../data/bie/processed/itaee.csv\",\n      stringsAsFactors = F) %>% \n    mutate(CVEENT = str_pad(CVEENT, 2, \"left\", \"0\"),\n           itaee  = original) %>% \n    rename(trimestre = fecha)\n  \n  # probamos a nivel estatal\n  prb <- x11 %>% \n    mutate(CVEENT = substr(CVEMUN, 1, 2)) %>% \n    select(-CVEMUN) %>%\n    group_by(CVEENT, trimestre) %>% \n    summarise_each(funs(sum)) %>%\n    inner_join(itaee, by = c(\"CVEENT\", \"trimestre\")) %>%\n    gather(\"predictor_x11\", \"valor\", \n        todos_x11:otrosbbv_x11, convert = T) %>%\n    group_by(CVEENT,Estado,predictor_x11) %>%\n    mutate(corr_x11 = cor(valor, itaee)) %>%\n    ungroup()\n  \n  sel_x11 <- prb %>% \n    select(CVEENT, Estado,predictor_x11,corr_x11) %>% unique() %>%\n    group_by(CVEENT, Estado) %>%\n    arrange(corr_x11)%>%\n    mutate(ones = 1, rank = cumsum(ones)) %>% \n    ungroup() %>%\n    filter((predictor_x11 ==\"banamex_x11\" & corr_x11>.95 ) | \n        rank == 9 ) %>%\n    group_by(CVEENT, Estado) %>%\n    arrange(corr_x11)%>%\n    mutate(ones = 1, rank = cumsum(ones)) %>% ungroup() %>%\n    filter(rank == 1)\n  \n  x11_selecto <- x11 %>% mutate(CVEENT= substr(CVEMUN,1,2)) %>%\n    gather(predictor_x11, valor, todos_x11:otrosbbv_x11,convert= T) %>%\n    inner_join(sel_x11, by = c(\"CVEENT\", \"predictor_x11\")) %>% \n    select(-rank, -ones, -Estado, -CVEENT, -corr_x11) %>%\n    rename(selecto_x11 = valor)\n  \n  # después de hacer las pruebas vamos a hacer algunos cambios proque \n  # no cuadran en los municipios:\n  sel_x11[sel_x11$CVEENT==\"08\", 3] <- \"banamex_x11\"\n  sel_x11[sel_x11$CVEENT==\"02\", 3] <- \"banamex_x11\"\n  sel_x11[sel_x11$CVEENT==\"09\", 3] <- \"sinbancomer_x11\"\n  sel_x11[sel_x11$CVEENT==\"15\", 3] <- \"banamex_x11\"\n} \n\nx11_selecto <- x11 %>% \n  mutate(CVEENT = substr(CVEMUN, 1, 2)) %>%\n  gather(\"predictor_x11\", \"valor\", todos_x11:otrosbbv_x11,\n      convert = TRUE)%>%\n  inner_join(sel_x11, by = c(\"CVEENT\", \"predictor_x11\")) %>% \n  select(-rank, -ones, -Estado, -CVEENT, -corr_x11) %>%\n  rename(selecto_x11 = valor)\n\nwrite.csv(x11_selecto, row.names = FALSE,\n  \"../data/cnbv/processed/predictor_x11_selecto_estatal_corregido.csv\")\n\n\n\n",
+    "created" : 1539037585526.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "35784037",
+    "id" : "4BD0E213",
+    "lastKnownWriteTime" : 1539032711,
+    "last_content_update" : 1539032711,
+    "path" : "~/programming/pap/otoño/indice-de-actividad-economica/imco_code/2c_selecciona_serie_magda.R",
+    "project_path" : null,
+    "properties" : {
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
