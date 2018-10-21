@@ -13,3 +13,10 @@ qgis_viirs_marcogeo.qgs~
 5_comprobar_porcnetajes.R
 
 *temp*
+packrat/lib*/
+.DS_Store
+.Rproj.user
+.Rhistory
+tests/testthat/packrat/
+packrat-scenario*/
+packrat/src/
