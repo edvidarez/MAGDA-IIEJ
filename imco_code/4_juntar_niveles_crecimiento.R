@@ -16,7 +16,7 @@ aplicar_crecimiento <- function(base, crec, columnas) {
     filter(!is.na(crec_fit)) %>% 
     group_by_(.dots = columnas) %>% 
     mutate(es_2014 = (trimestre >= "2014-12-01") & 
-            (lag(trimestre) < "2014-12-01"), 
+            (dplyr::lag(trimestre) < "2014-12-01"), 
         crec_acum = cumprod(1 + crec_fit),
         crec_14 = sum(crec_acum[es_2014]) %>% 
             replace(. == 0, 1), 
@@ -69,10 +69,10 @@ metros_eco_2 <- metros_eco %>%
   group_by(trimestre, CVEMET, zona_metro) %>% 
   summarize(magda = sum(acteco, na.rm = TRUE)) %>% 
   group_by(CVEMET, zona_metro) %>% arrange(trimestre) %>% 
-  mutate(var_trim  = magda/lag(magda) - 1,   
-         var_anual = magda/lag(magda, 4) - 1, 
-      anual_acum = (var_anual + lag(var_anual) + 
-          lag(var_anual,2) + lag(var_anual,3))/4) %>% 
+  mutate(var_trim  = magda/dplyr::lag(magda) - 1,   
+         var_anual = magda/dplyr::lag(magda, 4) - 1, 
+      anual_acum = (var_anual + dplyr::lag(var_anual) + 
+                      dplyr::lag(var_anual,2) + dplyr::lag(var_anual,3))/4) %>% 
   arrange(CVEMET, zona_metro)
 
 write_csv(metros_eco_2, 
