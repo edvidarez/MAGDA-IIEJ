@@ -15,7 +15,7 @@ cnbv <- read_csv("../data/cnbv/processed" %>% file.path(
   filter(trimestre > "2011-03-01")
 
 gg_cnbv <- cnbv %>% 
-  filter(trimestre < "2016-12_01") %>% 
+  filter(trimestre < "2016-12-01") %>% 
   ggplot(aes(trimestre, atm_1)) + 
   facet_wrap(~CVEENT, scales = "free_y") +
   geom_line()
@@ -32,8 +32,8 @@ if (entrena_modelo) {
       by = c("trimestre", "CVEENT")) %>% 
     group_by(CVEENT) %>% arrange(trimestre) %>% 
     mutate_at(vars(itaee, atm_1), 
-      funs(crec = . %>% divide_by(lag(., 1)) %>% subtract(1))) %>%
-    mutate(atm_crec_4 = lag(atm_1_crec, 4), 
+      funs(crec = . %>% divide_by(dplyr::lag(., 1)) %>% subtract(1))) %>%
+    mutate(atm_crec_4 = dplyr::lag(atm_1_crec, 4), 
       atm_1_anual = atm_1/lag(atm_1, 4) - 1) %>% 
     filter(trimestre < "2016-01-01", trimestre > "2012-12-01")
   
@@ -95,7 +95,7 @@ if (entrena_modelo) {
     group_by(CVEENT) %>% arrange(trimestre) %>% 
     mutate_at(vars(atm_1), 
       funs(atm_1_crec = . %>% {./lag(.) - 1})) %>%
-    mutate(atm_crec_4 = lag(atm_1_crec, 4), 
+    mutate(atm_crec_4 = dplyr::lag(atm_1_crec, 4), 
       atm_1_anual = atm_1/lag(atm_1, 4) - 1) %>% 
     filter(trimestre > "2011-07-01")
   
